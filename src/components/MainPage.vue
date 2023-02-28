@@ -1,0 +1,221 @@
+<template>
+  <v-layout style="z-index: 0">
+
+    <v-main>
+      <v-container>
+
+        <v-row>
+          <v-col cols="4">
+            <v-text-field
+              v-model="search"
+              clearable
+              label="поиск по названию"
+              variant="outlined"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="4">
+            <v-autocomplete
+              clearable
+              chips
+              label="Темы"
+              :items="allTags"
+              v-model="selectedTags"
+              item-title="name"
+              multiple
+            ></v-autocomplete>
+          </v-col>
+          <v-col cols="2">
+            <v-btn
+              rounded="lg"
+              color="info"
+              style="height: 55px;"
+              @click="requestUlinks"
+            >
+              Поиск
+            </v-btn>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col cols="1">
+            <v-btn @click="previousPage" icon="mdi-arrow-left" color="primary"></v-btn>
+
+          </v-col>
+          <v-col cols="1">
+            <div >
+              <div class="page-nums-container" v-if="currentPage===1">
+                <h4>1</h4> <div>.. {{ maxPage }}</div>
+              </div>
+              <div class="page-nums-container" v-else-if="currentPage > 1 && currentPage < maxPage">
+                <div>1 ..</div>  <h4> {{ currentPage }}</h4> <div> .. {{ maxPage }}</div>
+              </div>
+              <div class="page-nums-container" v-else-if="currentPage === maxPage">
+                <div> 1 .. </div> <h4>{{ maxPage }}</h4>
+              </div>
+              <div v-else>
+                something wrong
+              </div>
+            </div>
+
+          </v-col>
+          <v-col cols="1">
+            <v-btn @click="nextPage" icon="mdi-arrow-right" color="primary"></v-btn>
+          </v-col>
+          <v-col cols="2">
+            <v-select
+
+              label="Страница"
+              :items="pageList"
+              v-model="currentPage"
+            ></v-select>
+          </v-col>
+          <v-col cols="2">
+            <v-select
+
+              label="Кол-во записей на странице"
+              :items="['5', '10', '15', '25', '50', '100']"
+              v-model="itemsOnPage"
+            ></v-select>
+          </v-col>
+        </v-row>
+
+        <hr style="margin-top: 20px; margin-bottom: 20px;"/>
+
+        <v-row v-for="(data, i) in linksData" :key="i">
+
+          <LinkCardElement style="width: 100%;padding: 10px; min-height: 100px;"
+                           :data="data" :is-admin="isAdmin"/>
+
+        </v-row>
+
+
+      </v-container>
+
+
+    </v-main>
+
+
+  </v-layout>
+</template>
+
+<script setup>
+import {ref, defineProps} from "vue";
+import LinkCardElement from "@/components/LinkCardElement";
+import storage from "@/storage";
+import restClient from "@/restClient";
+
+const props = defineProps(['admin'])
+
+console.log('prps admin - ', props.admin)
+
+const isAdmin = ref(props.admin)
+
+
+
+//TODO: как запрашивать с тагами
+const allTags = ref([{name: 'California'}, {name: 'Colorado'}])
+const selectedTags = ref([])
+
+
+const search = ref("")
+const itemsOnPage = ref(10)
+const currentPage = ref(1)
+
+const allCount = ref(0)
+const maxPage = ref(0)
+
+const pageList = ref([1])
+
+
+const calcMaxPage = () => {
+  maxPage.value =
+    Math.floor(allCount.value / itemsOnPage.value) + (allCount.value % itemsOnPage.value > 0 ? 1 : 0)
+
+  pageList.value = Array.from({length: maxPage.value}, (x, i) => i + 1);
+
+
+  console.log("maxPage - ", maxPage.value)
+  console.log("pageList - ", pageList.value)
+
+}
+
+calcMaxPage()
+
+
+const itemsSkip = () => (currentPage.value - 1) * itemsOnPage.value
+
+
+const linksData = ref([
+  {
+    heading: "c# asp net manual",
+    link: "https://metanit.com/sharp/aspnet6/1.1.php",
+    description: " short intro to c# asp net",
+    tagList: [{name: "c#"}, {name: "asp.net"}]
+  }
+])
+
+const requestUlinks = () => {
+  restClient.Post('/ulinks', {
+    itemsSkip: itemsSkip(),
+    search: search.value ?? "",
+    itemsTake: itemsOnPage.value,
+    tags: selectedTags.value
+  }).then(json => {
+    console.log("json - ", json)
+    allCount.value = json.model.allCount
+    linksData.value = json.model.items
+
+    console.log(linksData.value)
+
+
+    console.log("all count - ", allCount.value)
+    calcMaxPage()
+    console.log("currentPage - ", currentPage.value)
+    console.log("maxPage - ", maxPage.value)
+
+  })
+}
+
+const requestTags = () => {
+
+  restClient.Get('/tags').then(json => {
+    //console.log(json.model)
+    allTags.value = json.model.map(item => item.name)
+  })
+
+}
+
+
+const nextPage = () => {
+
+  if (currentPage.value < maxPage.value) {
+    currentPage.value += 1
+  }
+
+  requestUlinks()
+}
+
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value -= 1
+  }
+
+  requestUlinks()
+}
+
+
+requestTags()
+
+requestUlinks()
+
+
+</script>
+
+<style scoped>
+
+.page-nums-container{
+  display: flex;
+}
+
+
+</style>
