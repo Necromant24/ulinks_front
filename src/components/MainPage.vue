@@ -2,18 +2,114 @@
   <v-layout style="z-index: 0">
 
     <v-main>
-      <v-container>
 
-        <v-row>
-          <v-col cols="4">
+      <!--      <v-container>-->
+
+      <!--        <v-row>-->
+      <!--          <v-col cols="4">-->
+      <!--            <v-text-field-->
+      <!--              v-model="search"-->
+      <!--              clearable-->
+      <!--              label="поиск по названию"-->
+      <!--              variant="outlined"-->
+      <!--            ></v-text-field>-->
+      <!--          </v-col>-->
+      <!--          <v-col cols="4">-->
+      <!--            <v-autocomplete-->
+      <!--              clearable-->
+      <!--              chips-->
+      <!--              label="Темы"-->
+      <!--              :items="allTags"-->
+      <!--              v-model="selectedTags"-->
+      <!--              item-title="name"-->
+      <!--              multiple-->
+      <!--            ></v-autocomplete>-->
+      <!--          </v-col>-->
+      <!--          <v-col cols="2">-->
+      <!--            <v-btn-->
+      <!--              rounded="lg"-->
+      <!--              color="info"-->
+      <!--              style="height: 55px;"-->
+      <!--              @click="requestUlinks"-->
+      <!--            >-->
+      <!--              Поиск-->
+      <!--            </v-btn>-->
+      <!--          </v-col>-->
+      <!--        </v-row>-->
+
+
+      <!--        <v-row>-->
+      <!--          <v-col cols="1">-->
+      <!--            <v-btn @click="previousPage" icon="mdi-arrow-left" color="primary"></v-btn>-->
+
+      <!--          </v-col>-->
+      <!--          <v-col cols="1">-->
+      <!--            <div >-->
+      <!--              <div class="page-nums-container" v-if="currentPage===1">-->
+      <!--                <h4>1</h4> <div>.. {{ maxPage }}</div>-->
+      <!--              </div>-->
+      <!--              <div class="page-nums-container" v-else-if="currentPage > 1 && currentPage < maxPage">-->
+      <!--                <div>1 ..</div>  <h4> {{ currentPage }}</h4> <div> .. {{ maxPage }}</div>-->
+      <!--              </div>-->
+      <!--              <div class="page-nums-container" v-else-if="currentPage === maxPage">-->
+      <!--                <div> 1 .. </div> <h4>{{ maxPage }}</h4>-->
+      <!--              </div>-->
+      <!--              <div v-else>-->
+      <!--                something wrong-->
+      <!--              </div>-->
+      <!--            </div>-->
+
+      <!--          </v-col>-->
+      <!--          <v-col cols="1">-->
+      <!--            <v-btn @click="nextPage" icon="mdi-arrow-right" color="primary"></v-btn>-->
+      <!--          </v-col>-->
+      <!--          <v-col cols="2">-->
+      <!--            <v-select-->
+
+      <!--              label="Страница"-->
+      <!--              :items="pageList"-->
+      <!--              v-model="currentPage"-->
+      <!--            ></v-select>-->
+      <!--          </v-col>-->
+      <!--          <v-col cols="2">-->
+      <!--            <v-select-->
+
+      <!--              label="Кол-во записей на странице"-->
+      <!--              :items="['5', '10', '15', '25', '50', '100']"-->
+      <!--              v-model="itemsOnPage"-->
+      <!--            ></v-select>-->
+      <!--          </v-col>-->
+      <!--        </v-row>-->
+
+
+      <!--        <hr style="margin-top: 20px; margin-bottom: 20px;"/>-->
+
+      <!--        <v-row v-for="(data, i) in linksData" :key="i">-->
+
+      <!--          <LinkCardElement style="width: 100%;padding: 10px; min-height: 100px;"-->
+      <!--                           :data="data" :is-admin="isAdmin"/>-->
+
+      <!--        </v-row>-->
+
+
+      <!--      </v-container>-->
+
+      <div class="main-container">
+
+
+        <div class="settings-container">
+
+
+          <div class="search">
             <v-text-field
               v-model="search"
               clearable
               label="поиск по названию"
               variant="outlined"
             ></v-text-field>
-          </v-col>
-          <v-col cols="4">
+          </div>
+
+          <div class="theme-selector">
             <v-autocomplete
               clearable
               chips
@@ -23,79 +119,100 @@
               item-title="name"
               multiple
             ></v-autocomplete>
-          </v-col>
-          <v-col cols="2">
+          </div>
             <v-btn
+
+              class="search-btn"
               rounded="lg"
               color="info"
-              style="height: 55px;"
               @click="requestUlinks"
             >
               Поиск
             </v-btn>
-          </v-col>
-        </v-row>
 
-        <v-row>
-          <v-col cols="1">
-            <v-btn @click="previousPage" icon="mdi-arrow-left" color="primary"></v-btn>
 
-          </v-col>
-          <v-col cols="1">
-            <div >
-              <div class="page-nums-container" v-if="currentPage===1">
-                <h4>1</h4> <div>.. {{ maxPage }}</div>
-              </div>
-              <div class="page-nums-container" v-else-if="currentPage > 1 && currentPage < maxPage">
-                <div>1 ..</div>  <h4> {{ currentPage }}</h4> <div> .. {{ maxPage }}</div>
-              </div>
-              <div class="page-nums-container" v-else-if="currentPage === maxPage">
-                <div> 1 .. </div> <h4>{{ maxPage }}</h4>
-              </div>
-              <div v-else>
-                something wrong
+          <div class="page-selector">
+
+            <div>
+              <v-btn @click="previousPage" icon="mdi-arrow-left" color="primary"></v-btn>
+            </div>
+            <div class="page-selector-display">
+              <div>
+                <div class="page-nums-container" v-if="currentPage===1">
+                  <h4>1</h4>
+                  <div>.. {{ maxPage }}</div>
+                </div>
+                <div class="page-nums-container" v-else-if="currentPage > 1 && currentPage < maxPage">
+                  <div>1 ..</div>
+                  <h4> {{ currentPage }}</h4>
+                  <div> .. {{ maxPage }}</div>
+                </div>
+                <div class="page-nums-container" v-else-if="currentPage === maxPage">
+                  <div> 1 ..</div>
+                  <h4>{{ maxPage }}</h4>
+                </div>
+                <div v-else>
+                  something wrong
+                </div>
               </div>
             </div>
+            <div>
+              <v-btn @click="nextPage" icon="mdi-arrow-right" color="primary"></v-btn>
+            </div>
 
-          </v-col>
-          <v-col cols="1">
-            <v-btn @click="nextPage" icon="mdi-arrow-right" color="primary"></v-btn>
-          </v-col>
-          <v-col cols="2">
+
+          </div>
+
+
+          <div class="page-select">
             <v-select
 
               label="Страница"
               :items="pageList"
               v-model="currentPage"
             ></v-select>
-          </v-col>
-          <v-col cols="2">
+          </div>
+          <div class="records-count-select">
             <v-select
 
               label="Кол-во записей на странице"
               :items="['5', '10', '15', '25', '50', '100']"
               v-model="itemsOnPage"
             ></v-select>
-          </v-col>
-        </v-row>
+          </div>
+
+
+        </div>
 
         <hr style="margin-top: 20px; margin-bottom: 20px;"/>
 
-        <v-row v-for="(data, i) in linksData" :key="i">
+        <div class="cards-container">
 
-          <LinkCardElement style="width: 100%;padding: 10px; min-height: 100px;"
-                           :data="data" :is-admin="isAdmin"/>
+          <div v-for="(data, i) in linksData" :key="i">
 
-        </v-row>
+            <LinkCardElement style="width: 100%;padding: 10px; min-height: 100px;"
+                             :data="data" :is-admin="isAdmin"/>
+
+          </div>
 
 
-      </v-container>
+        </div>
+
+
+      </div>
 
 
     </v-main>
 
 
   </v-layout>
+
+
+  <div>
+
+
+  </div>
+
 </template>
 
 <script setup>
@@ -109,7 +226,6 @@ const props = defineProps(['admin'])
 console.log('prps admin - ', props.admin)
 
 const isAdmin = ref(props.admin)
-
 
 
 //TODO: как запрашивать с тагами
@@ -213,9 +329,95 @@ requestUlinks()
 
 <style scoped>
 
-.page-nums-container{
+.page-selector-display{
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+
+}
+
+.main-container {
+  padding: 10px;
+}
+
+
+.settings-container {
+
+  display: grid;
+
+  grid-template:
+    " search themeselector searchbtn "
+    " pageselectorel  pageselect recordscountselect ";
+
+  grid-column-gap: 20px;
+
+}
+
+
+
+.records-count-select{
+  grid-area: recordscountselect;
+}
+
+
+.page-select{
+  grid-area: pageselect;
+}
+
+.page-selector-el{
+  grid-area: pageselectorel;
+}
+
+.search-btn{
+  grid-area: searchbtn;
+  margin: auto;
+  margin-top: 0;
+
+  height: 60%;
+  width: 200px;
+
+  min-height: 40px;
+
+}
+
+.search{
+  grid-area: search;
+}
+
+.theme-selector{
+  grid-area: themeselector;
+}
+
+
+.page-selector {
+  display: flex;
+  grid-area: pageselectorel;
+}
+
+.page-grid {
+  display: grid;
+
+}
+
+.page-nums-container {
   display: flex;
 }
+
+
+
+@media screen and (max-width: 600px) {
+
+  .settings-container{
+
+    grid-template: " search" " themeselector "
+    " pageselectorel " " pageselect " " recordscountselect " " searchbtn ";
+
+    grid-row-gap: 10px;
+
+  }
+
+}
+
 
 
 </style>
